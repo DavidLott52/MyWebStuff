@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "blankProject", "javascript\blankProject.csproj", "{4ECEF6F4-3F4A-4952-9AC5-80B05A2FF81A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "javascript", "javascript\javascript.csproj", "{4ECEF6F4-3F4A-4952-9AC5-80B05A2FF81A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

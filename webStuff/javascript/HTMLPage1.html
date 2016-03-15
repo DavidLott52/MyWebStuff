@@ -1,0 +1,34 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/knockout/3.1.0/knockout-min.js"></script>
+    <script src="scripts/moment.js"></script>
+    <script src="scripts/moment-timezone-with-data-2010-2020.js"></script>
+    <script src="scripts/mit.js"></script>
+    <script src="scripts/koMitDatePicker.js"></script>
+    <script src="scripts/koMitTimePicker.js"></script>
+    <script src="scripts/timespan.js"></script>
+    <script src="scripts/koTimeSpanStartDatePicker.js"></script>
+<!--    <script src="scripts/dl-ko-mit.js"></script>-->
+</head>
+    <body>
+        <script type="text/javascript">
+            $(function () {
+                mit.setTimezone("Eastern Standard Time");
+                var vm = {
+                    now: ko.observable(mit.now()),
+                    ts: ko.observable(timespan(mit.now(), mit.now().add(43, "minutes")))
+                };
+                ko.applyBindings(vm);
+            });
+        </script>
+        <input data-bind="mitdatepicker: now" />
+        <input data-bind="mittimepicker: now" />
+        <div data-bind="text: now().format()"></div>
+        <input data-bind="timespanstartdatepicker: ts" />
+    </body>
+</html>
