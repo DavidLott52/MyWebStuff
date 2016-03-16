@@ -30,7 +30,8 @@
                 } else {
                     _end = _start.add(value, "minutes");
                 }
-            }
+            },
+            isTimeSpan: true
         };
     }
 })();

@@ -62,7 +62,7 @@
     this._add = function (v, unit) {
         if (!unit) {
             v += this.u;
-            return mit(v);
+            return new mit(v);
         }
         var u = moment(this.u).add(v, unit).valueOf();
         var result = _makeMit(u);
@@ -72,10 +72,12 @@
         }
         return result;
     }
-    this._makeMit = function (u) {
+    this._makeMit = function (v) {
         return {
-            u: u,
-            t: moment(u).format(),
+            u: v,
+            get t() {
+                return moment(this.u).format();
+            },
             ismit: true,
             add: _add,
             format: _format,
@@ -155,7 +157,7 @@
     // Copyright 2013 Joris de Wit and bootstrap-timepicker contributors
     this._setTime = function (time) {
         if (!time) {
-            return mit(this);
+            return new mit(this);
         }
 
         var timeMode,
@@ -165,7 +167,7 @@
             second,
             meridian;
         if (time.ismit) {
-            mit(time);
+            return new mit(time);
         }
         else if (typeof time === 'object' && time.getMonth) {
             // this is a date object
@@ -184,18 +186,18 @@
                     meridian = 'PM';
                 }
             }
-            return mit(time);
+            return new mit(time);
         } else {
             timeMode = ((/a/i).test(time) ? 1 : 0) + ((/p/i).test(time) ? 2 : 0); // 0 = none, 1 = AM, 2 = PM, 3 = BOTH.
             if (timeMode > 2) { // If both are present, fail.
-                return mit(this);
+                return new mit(this);
             } else {
                 timeArray = time.replace(/[^0-9\:]/g, '').split(':');
 
                 hour = timeArray[0] ? timeArray[0].toString() : timeArray.toString();
 
                 if (this.explicitMode && hour.length > 2 && (hour.length % 2) !== 0) {
-                    return mit(this);
+                    return new mit(this);
                 }
 
                 minute = timeArray[1] ? timeArray[1].toString() : '';
@@ -269,10 +271,10 @@
                     }
                 }
             }
-            var x = mit(this).startOf("day").add(hour, "hours").add(minute, "minutes").add(second, "seconds");
+            var str = this.format("MM/DD/YYYY ") + hour.toPrecision(2) + ":" + minute.toPrecision(2) + ":" + second.toPrecision(2);
+            var x = new mit(str, "MM/DD/YYYY hh:mm:ss");
             return x;
         }
-        return mit(this);
     };
 
     // Gets the overall default time zone
@@ -424,5 +426,4 @@
 "Pacific/Tongatapu|Tonga Standard Time"
         ]);
     }
-
 })();

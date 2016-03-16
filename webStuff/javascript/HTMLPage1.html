@@ -9,26 +9,38 @@
     <script src="scripts/moment.js"></script>
     <script src="scripts/moment-timezone-with-data-2010-2020.js"></script>
     <script src="scripts/mit.js"></script>
-    <script src="scripts/koMitDatePicker.js"></script>
-    <script src="scripts/koMitTimePicker.js"></script>
+<!--    <script src="scripts/koMitDatePicker.js"></script>-->
+<!--    <script src="scripts/koMitTimePicker.js"></script>-->
     <script src="scripts/timespan.js"></script>
-    <script src="scripts/koTimeSpanStartDatePicker.js"></script>
+    <script src="scripts/koTimeSpanBindings.js"></script>
 <!--    <script src="scripts/dl-ko-mit.js"></script>-->
 </head>
     <body>
         <script type="text/javascript">
             $(function () {
                 mit.setTimezone("Eastern Standard Time");
+                var start = mit.now();
+                var end = start.add(43, "minutes");
                 var vm = {
-                    now: ko.observable(mit.now()),
-                    ts: ko.observable(timespan(mit.now(), mit.now().add(43, "minutes")))
+                    x: ko.observable(start),
+                    ts: ko.observable(timespan(start, end))
                 };
                 ko.applyBindings(vm);
+                setInterval(function() {
+                    console.log(end.format());
+                }, 5000);
             });
         </script>
-        <input data-bind="mitdatepicker: now" />
-        <input data-bind="mittimepicker: now" />
-        <div data-bind="text: now().format()"></div>
-        <input data-bind="timespanstartdatepicker: ts" />
+        
+
+        <input data-bind="mitdate: x" />
+        <input data-bind="mittime: x" />
+        <div data-bind="text: x().format()"></div>
+        <input data-bind="timespanstartdate: ts" />
+        <input data-bind="timespanstarttime: ts" />
+        <input data-bind="timespanenddate: ts" />
+        <input data-bind="timespanendtime: ts" />
+        <input data-bind="timespanduration: ts" />
+        <div data-bind="text: ts().start.format() + ' - ' + ts().end.format() + ' - ' + ts().minutes "  ></div>
     </body>
 </html>

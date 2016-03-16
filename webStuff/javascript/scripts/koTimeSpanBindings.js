@@ -1,189 +1,249 @@
-﻿;datetimebinder = (function(strategy) {
-    var self = this;
-    self.strategy = strategy;
+﻿;var DateTimeBinder = function(strategy) {
     // generic method called to initialize the ko binding applying the specified strategy
-    self.init = function(element, valueAccessor, allBindingsAccessor) {
+    var init = function (element, valueAccessor, allBindingsAccessor) {
+        // update the extend strategy with ko accessors
+        strategy.allBindingsAccessor = allBindingsAccessor;
+        strategy.valueAccessor = valueAccessor;
+        element.strategy = strategy;
         // show a picker image after the input (action not implemented yet)
-        var observable = valueAccessor();
-        var showPickerImage = allBindingsAccessor.get('showPickerImage') || false;
+        var showPickerImage = strategy.allBindingsAccessor.get('showPickerImage') || false;
         if (showPickerImage) {
-            $(element).after("<i class='" + self.strategy.css + " " + self.strategy.icon + "' style='cursor: pointer'></i>");
-            $("." + self.strategy.css).click(function() {
+            $(element).after("<i class='" + strategy.css + " " + strategy.icon + "' style='cursor: pointer'></i>");
+            $("." + strategy.css).click(function() {
                 alert("action not implemented");
             });
         }
         // handler for when the user changes the value in the input
-        ko.utils.registerEventHandler(element, 'change', self.strategy.updateObservable(element, observable, allBindingsAccessor));
+        ko.utils.registerEventHandler(element, 'change', strategy.updateObservable);
         // select the entire input text when it gets focus
         ko.utils.registerEventHandler(element, 'click', function() {
             $(this).select();
         });
     }
     // generic method called to update the element when the vm has changed, applying the specified strategy
-    self.update = function (element, valueAccessor, allBindingsAccessor) {
-        var value = ko.utils.unwrapObservable(valueAccessor());
-        value = this.strategy.getValue(value);
-        this.strategy.updateElement(element, value);
+    var update = function (element) {
+        var value = ko.utils.unwrapObservable(strategy.valueAccessor());
+        strategy.updateElement(element, value);
     }
     return {
-        init: self.init,
-        update:self.update,
-        owner: self
+        init: init,
+        update: update,
+        owner: this
     }
-})();
+};
 
-
-datetimebinder.prototype.updateMitDateFromElement = function (element, observable, allBindingsAccessor) {
-    var v;
-    var unwrappedObservable = ko.utils.unwrapObservable(observable);
-    if (typeof unwrappedObservable === "object") {
-        var theMit = strategy.getTheMit ? strategy.getTheMit(unwrappedObservable) : unwrappedObservable;
-        var format = allBindingsAccessor.get('format') || strategy.defaultFormat;
-        var mod = theMit.minuteOfDay();
-        v = mit($(element).val(), format).add(mod, "minutes");
-    } else {
-        // todo - support more formats?
-        // todo - use bootstrap datepicker
-        throw "don't know how to interpet '" + unwrappedObservable + "'";
-    }
-    unwrappedObservable.start = v;
-    if (observable().start === v) {
-        observable(unwrappedObservable);
-        ko.bindingHandlers.mitdatepicker.update(element, valueAccessor, allBindingsAccessor);
-    } else {
-        observable(unwrappedObservable);
-    }
-}
-
-datetimebinder.defaultMitTimeStrategy = {
-    getTheMit: function (value) { return value; },
-    updateObservable: function (element, observable, allBindingsAccessor) {
-        var newMit;
-        var unwrappedObservable = ko.utils.unwrapObservable(observable);
-        if (typeof unwrappedObservable === "object" && unwrappedObservable.hasOwnProperty(ismit)) {
-            var oldMit = unwrappedObservable;
-            var format = allBindingsAccessor.get('format') || defaultFormat;
-            var mod = oldMit.minuteOfDay();
-            newMit = mit($(element).val(), format).add(mod, "minutes");
-        } else {
-            // todo - support more formats?
-            // todo - use bootstrap datepicker
-            throw "don't know how to interpet '" + unwrappedObservable + "'";
-        }
-        unwrappedObservable.start = newMit;
-        if (observable().start === newMit) {
-            observable(unwrappedObservable);
-            ko.bindingHandlers.mitdatepicker.update(element, valueAccessor);
-        } else {
-            observable(unwrappedObservable);
-        }
-    }
-}
-datetimebinder.defaultMitDateStrategy = {
-    getTheMit: function (value) { return value; },
-    updateObservable: function (element, observable, allBindingsAccessor) {
-        var newMit;
-        var unwrappedObservable = ko.utils.unwrapObservable(observable);
-        if (typeof unwrappedObservable === "object") {
-            var oldMit = unwrappedObservable;
-            var format = allBindingsAccessor.get('format') || defaultFormat;
-            var mod = oldMit.minuteOfDay();
-            newMit = mit($(element).val(), format).add(mod, "minutes");
-        } else {
-            // todo - support more formats?
-            // todo - use bootstrap datepicker
-            throw "don't know how to interpet '" + unwrappedObservable + "'";
-        }
-        unwrappedObservable.start = newMit;
-        if (observable().start === newMit) {
-            observable(unwrappedObservable);
-            ko.bindingHandlers.mitdatepicker.update(element, valueAccessor);
-        } else {
-            observable(unwrappedObservable);
-        }
-    }
-}
-datetimebinder.defaultStartTimeStrategy = {
-    getTheMit: function (value) { return value.start; },
-    updateObservable: function (element, observable, allBindingsAccessor) {
-        var newMit;
-        var unwrappedObservable = ko.utils.unwrapObservable(observable);
-        if (typeof unwrappedObservable === "object") {
-            var oldMit = unwrappedObservable;
-            var format = allBindingsAccessor.get('format') || defaultFormat;
-            var mod = oldMit.minuteOfDay();
-            newMit = mit($(element).val(), format).add(mod, "minutes");
-        } else {
-            // todo - support more formats?
-            // todo - use bootstrap datepicker
-            throw "don't know how to interpet '" + unwrappedObservable + "'";
-        }
-        unwrappedObservable.start = newMit;
-        if (observable().start === newMit) {
-            observable(unwrappedObservable);
-            ko.bindingHandlers.mitdatepicker.update(element, valueAccessor);
-        } else {
-            observable(unwrappedObservable);
-        }
-    }
-}
-
-datetimebinder.defaultEndTimeStrategy = {
-    getTheMit: function (value) { return value.end; },
-    updateObservable: function (element, observable, allBindingsAccessor) {
-        var newMit;
-        var unwrappedObservable = ko.utils.unwrapObservable(observable);
-        if (typeof unwrappedObservable === "object") {
-            var oldMit = unwrappedObservable;
-            var format = allBindingsAccessor.get('format') || defaultFormat;
-            var mod = oldMit.minuteOfDay();
-            newMit = mit($(element).val(), format).add(mod, "minutes");
-        } else {
-            // todo - support more formats?
-            // todo - use bootstrap datepicker
-            throw "don't know how to interpet '" + unwrappedObservable + "'";
-        }
-        unwrappedObservable.start = newMit;
-        if (observable().start === newMit) {
-            observable(unwrappedObservable);
-            ko.bindingHandlers.mitdatepicker.update(element, valueAccessor);
-        } else {
-            observable(unwrappedObservable);
-        }
-    }
-}
-
-datetimebinder.dateDefaultStrategy = {
+// strategies 
+DateTimeBinder.dateDefaultStrategy = {
     css: "datepicker-image'",
     icon: "icon-date",
     defaultFormat: "MM/DD/YYYY",
-    getTheMit: function (value) { return value; },
 };
-
-datetimebinder.timeDefaultStrategy = {
+DateTimeBinder.timeDefaultStrategy = {
     css: "timepicker-image'",
     icon: "icon-time",
     defaultFormat: "hh:mm A",
 }
-
-ko.bindingHandlers.timespanstartdatepicker = {
-    strategy:  $.extend(true,datetimebinder.dateDefaultStrategy, datetimebinder.defaultStartTimeStrategy),
-    init: function (element, valueAccessor, allBindingsAccessor) {
-        datetimebinder.init(element, valueAccessor, allBindingsAccessor, strategy);
+DateTimeBinder.durationDefaultStrategy = {
+    css: "timepicker-image'",
+    icon: "icon-time",
+    updateElement: function (element, value) {
+        var m = moment.duration(value.minutes, "minutes");
+        $(element).val(m.asHours().toFixed(2));
     },
-    // when the observable is updated...
-    update: function (element, valueAccessor, allBindingsAccessor,) {
-        var timespan = ko.utils.unwrapObservable(valueAccessor());
-        var format = allBindingsAccessor.get('format') || "MM/DD/YYYY";
-        if (typeof timespan === "object") {
-            $(element).val(timespan.start.format(format));
+    updateObservable: function (event) {
+        var element = event.target;
+        var observable = element.strategy.valueAccessor();
+        var unwrappedObservable = ko.utils.unwrapObservable(observable) || {};
+        if (typeof unwrappedObservable === "object" && unwrappedObservable.isTimeSpan ) {
+            var m = moment.duration(Number($(element).val()),"hours");
+        } else {
+            throw "don't know how to interpet '" + unwrappedObservable + "'";
+        }
+        if (unwrappedObservable.minutes === m.asMinutes()) {
+            ko.bindingHandlers.timespanduration.update(element, element.strategy.valueAccessor, element.strategy.allBindingsAccessor);
+        } else {
+            unwrappedObservable.minutes = m.asMinutes();
+            observable(unwrappedObservable);
+        }
+    }
+}
+DateTimeBinder.mitTimeDefaultStrategy = {
+    updateElement: function (element, value) {
+        var format = element.strategy.allBindingsAccessor.get('format') || element.strategy.defaultFormat;
+        $(element).val(value.format(format));
+    },
+    updateObservable: function (event) {
+        var element = event.target;
+        var observable = element.strategy.valueAccessor();
+        var newMit;
+        var unwrappedObservable = ko.utils.unwrapObservable(observable) || {};
+        if (typeof unwrappedObservable === "object" ) {
+            var oldMit = unwrappedObservable.ismit ? unwrappedObservable : new mit(unwrappedObservable);
+            newMit = oldMit.setTime($(element).val());
+        } else {
+            newMit = new mit(0).startOf("day").setTime($(element).val());
+        }
+        if (unwrappedObservable.u === newMit.u) {
+            ko.bindingHandlers.mittime.update(element, element.strategy.valueAccessor, element.strategy.allBindingsAccessor);
+        } else {
+            unwrappedObservable.u = newMit.u;
+            observable(unwrappedObservable);
+        }
+    }
+}
+DateTimeBinder.mitDateDefaultStrategy = {
+    updateElement: function (element, value) {
+        var format = element.strategy.allBindingsAccessor.get('format') || element.strategy.defaultFormat;
+        $(element).val(value.format(format));
+    },
+    updateObservable: function (event) {
+        var element = event.target;
+        var observable = element.strategy.valueAccessor();
+        var newMit;
+        var unwrappedObservable = ko.utils.unwrapObservable(observable) || {};
+        if (typeof unwrappedObservable === "object" && unwrappedObservable.ismit) {
+            var oldMit = unwrappedObservable;
+            var format = element.strategy.allBindingsAccessor.get('format') || element.strategy.defaultFormat;
+            newMit = new mit($(element).val(), format).setTime(oldMit.format("hh:mm:ss"));
+        } else {
+            // todo - support more formats?
+            // todo - use bootstrap datepicker2
+            throw "don't know how to interpet '" + unwrappedObservable + "'";
+        }
+        if (unwrappedObservable.u === newMit.u) {
+            ko.bindingHandlers.mitdate.update(element, element.strategy.valueAccessor, element.strategy.allBindingsAccessor);
+        } else {
+            unwrappedObservable.u = newMit.u;
+            observable(unwrappedObservable);
+        }
+    }
+}
+DateTimeBinder.startDateDefaultStrategy = {
+    updateElement: function (element, value) {
+        var format = element.strategy.allBindingsAccessor.get('format') || element.strategy.defaultFormat;
+        $(element).val(value.start.format(format));
+    },
+    updateObservable: function (event) {
+        var element = event.target;
+        var observable = element.strategy.valueAccessor();
+        var newMit;
+        var unwrappedObservable = ko.utils.unwrapObservable(observable) || {};
+        if (typeof unwrappedObservable === "object" && unwrappedObservable.isTimeSpan) {
+            var oldMit = unwrappedObservable.start;
+            var format = element.strategy.allBindingsAccessor.get('format') || element.strategy.defaultFormat;
+            newMit = new mit($(element).val(), format).setTime(oldMit.format("hh:mm:ss"));
         } else {
             // todo - support more formats?
             // todo - use bootstrap datepicker
-            throw "don't know how to interpet '" + timespan + "'";
+            throw "don't know how to interpet '" + unwrappedObservable + "'";
+        }
+        if (unwrappedObservable.start.u === newMit.u) {
+            ko.bindingHandlers.timespanstartdate.update(element, element.strategy.valueAccessor, element.strategy.allBindingsAccessor);
+        } else {
+            unwrappedObservable.start.u = newMit.u;
+            observable(unwrappedObservable);
         }
     }
-};
-ko.bindingHandlers.timespanenddatepicker = {
+}
+DateTimeBinder.startTimeDefaultStrategy = {
+    updateElement: function (element, value) {
+        var format = element.strategy.allBindingsAccessor.get('format') || element.strategy.defaultFormat;
+        $(element).val(value.start.format(format));
+    },
+    updateObservable: function (event) {
+        var element = event.target;
+        var observable = element.strategy.valueAccessor();
+        var newMit;
+        var unwrappedObservable = ko.utils.unwrapObservable(observable) || {};
+        if (typeof unwrappedObservable === "object") {
+            var oldMit = unwrappedObservable.isTimeSpan ? unwrappedObservable.start : new mit(unwrappedObservable);
+            newMit = oldMit.setTime($(element).val());
+        } else {
+            newMit = new mit(0).startOf("day").setTime($(element).val());
+        }
+        if (unwrappedObservable.start.u === newMit.u) {
+            ko.bindingHandlers.timespanstarttime.update(element, element.strategy.valueAccessor, element.strategy.allBindingsAccessor);
+        } else {
+            unwrappedObservable.start.u = newMit.u;
+            observable(unwrappedObservable);
+        }
+    }
+}
+DateTimeBinder.endTimeDefaultStrategy = {
+    updateElement: function (element, value) {
+        var format = element.strategy.allBindingsAccessor.get('format') || element.strategy.defaultFormat;
+        $(element).val(value.end.format(format));
+    },
+    updateObservable: function (event) {
+        var element = event.target;
+        var observable = element.strategy.valueAccessor();
+        var newMit;
+        var unwrappedObservable = ko.utils.unwrapObservable(observable) || {};
+        if (typeof unwrappedObservable === "object") {
+            var oldMit = unwrappedObservable.isTimeSpan ? unwrappedObservable.end : new mit(unwrappedObservable);
+            newMit = oldMit.setTime($(element).val());
+        } else {
+            newMit = new mit(0).startOf("day").setTime($(element).val());
+        }
+        if (unwrappedObservable.end.u === newMit.u) {
+            ko.bindingHandlers.timespanendtime.update(element, element.strategy.valueAccessor, element.strategy.allBindingsAccessor);
+        } else {
+            unwrappedObservable.end.u = newMit.u;
+            observable(unwrappedObservable);
+        }
+    }
+}
+DateTimeBinder.endDateDefaultStrategy = {
+    updateElement: function (element, value) {
+        var format = element.strategy.allBindingsAccessor.get('format') || element.strategy.defaultFormat;
+        $(element).val(value.end.format(format));
+    },
+    updateObservable: function (event) {
+        var element = event.target;
+        var observable = element.strategy.valueAccessor();
+        var newMit;
+        var unwrappedObservable = ko.utils.unwrapObservable(observable) || {};
+        if (typeof unwrappedObservable === "object" && unwrappedObservable.isTimeSpan) {
+            var oldMit = unwrappedObservable.end;
+            var format = element.strategy.allBindingsAccessor.get('format') || element.strategy.defaultFormat;
+            newMit = new mit($(element).val(), format).setTime(oldMit.format("hh:mm:ss"));
+        } else {
+            // todo - support more formats?
+            // todo - use bootstrap datepicker
+            throw "don't know how to interpet '" + unwrappedObservable + "'";
+        }
+        if (unwrappedObservable.end.u === newMit.u) {
+            ko.bindingHandlers.timespanenddate.update(element, element.strategy.valueAccessor, element.strategy.allBindingsAccessor);
+        } else {
+            unwrappedObservable.end.u = newMit.u;
+            observable(unwrappedObservable);
+        }
+    }
+}
 
-};
+// bindings
+ko.bindingHandlers.mitdate = new DateTimeBinder( 
+    $.extend(true, { name: "mitdate" }, DateTimeBinder.dateDefaultStrategy, DateTimeBinder.mitDateDefaultStrategy)
+);
+ko.bindingHandlers.mittime = new DateTimeBinder(
+    $.extend(true, { name: "mittime" }, DateTimeBinder.timeDefaultStrategy, DateTimeBinder.mitTimeDefaultStrategy)
+);
+ko.bindingHandlers.timespanstartdate = new DateTimeBinder (
+    $.extend(true, { name: "timespanstartdate" }, DateTimeBinder.dateDefaultStrategy, DateTimeBinder.startDateDefaultStrategy)
+);
+ko.bindingHandlers.timespanstarttime = new DateTimeBinder(
+    $.extend(true, { name: "timespanstarttime" }, DateTimeBinder.timeDefaultStrategy, DateTimeBinder.startTimeDefaultStrategy)
+);
+ko.bindingHandlers.timespanenddate = new DateTimeBinder (
+    $.extend(true, { name: "timespanenddate" }, DateTimeBinder.dateDefaultStrategy, DateTimeBinder.endDateDefaultStrategy)
+);
+ko.bindingHandlers.timespanendtime = new DateTimeBinder (
+    $.extend(true, { name: "timespanendtime" }, DateTimeBinder.timeDefaultStrategy, DateTimeBinder.endTimeDefaultStrategy)
+);
+ko.bindingHandlers.timespanduration = new DateTimeBinder(
+    $.extend(true, { name: "timespanduration" }, DateTimeBinder.durationDefaultStrategy)
+);
+
+
+
+

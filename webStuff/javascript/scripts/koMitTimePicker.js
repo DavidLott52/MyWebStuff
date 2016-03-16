@@ -1,4 +1,4 @@
-﻿ko.bindingHandlers.mittimepicker = {
+﻿ko.bindingHandlers.mittime = {
     init: function (element, valueAccessor, allBindingsAccessor) {
         // show a picker image after the input (action not implemented yet)
         var observable = valueAccessor();
@@ -24,7 +24,7 @@
             }
             if (observable() === v) {
                 observable(v);
-                ko.bindingHandlers.mittimepicker.update(element, valueAccessor, allBindingsAccessor);
+                ko.bindingHandlers.mittime.update(element, valueAccessor, allBindingsAccessor);
             } else {
                 observable(v);
             }
